@@ -1,0 +1,14 @@
+{
+  "headers": {},
+  "attachments": {},
+  "body": {
+    "body": {
+      "ROUTELIST": {
+        "ROUTEINFO": {
+          "ORIGIN": "MY-KUL",
+          "DESTINATION": "SG-BEU"
+        }
+      }
+    }
+  }
+}

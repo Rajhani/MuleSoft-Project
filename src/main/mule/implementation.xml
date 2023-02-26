@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="c42aa884-e78f-4ae1-9821-727551e68c78" >
+		<wsc:connection wsdlLocation="http://transnationalextsystem.us-e2.cloudhub.io/Bookings/BookingsSOAP?wsdl" service="Bookings" port="BookingsSOAP" address="http://transnationalextsystem.us-e2.cloudhub.io/Bookings/BookingsSOAP"/>
+	</wsc:config>
+	<flow name="soapSystem" doc:id="2412532f-f8f5-4d25-adea-9f20f16b402d" >
+		<ee:transform doc:name="Transform Message" doc:id="a573bad8-85e8-450b-b2c1-581c0071e2b3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.example.org/Bookings/
+
+---
+{
+	ns0#getRoutes: {
+		in: (payload.destinationLocation.locationCode as String default "") ++ (payload.originLocation.locationCode as String default "")
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Consume" doc:id="d3d68fe8-52e7-4d9e-8764-9f3044e1706c" config-ref="Web_Service_Consumer_Config" operation="getRoutes">
+		</wsc:consume>
+		<logger level="INFO" doc:name="Logger" doc:id="52f9126f-70e9-4f39-8cf8-a3e657eb7053" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="cd6fd6a7-8e79-4f3c-8bc1-562231efe28e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="512d213e-3837-487d-925d-b34978c08dc7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	destinationLocation: {
+		locationCode: (payload.body.body.ROUTELIST.ROUTEINFO.DESTINATION as String)
+	},
+	originLocation: {
+		locationCode: (payload.body.body.ROUTELIST.ROUTEINFO.ORIGIN as String)
+	}
+}]
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cd14525d-6221-42df-af12-2302bd52cddb" message="#[payload]" />
+	</flow>
+</mule>

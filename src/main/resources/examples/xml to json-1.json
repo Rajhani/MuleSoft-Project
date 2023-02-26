@@ -1,0 +1,14 @@
+{
+  "Envelope": {
+    "Body": {
+      "body": {
+        "ROUTELIST": {
+          "ROUTEINFO": {
+            "ORIGIN": "MY-KUL",
+            "DESTINATION": "SG-BEU"
+          }
+        }
+      }
+    }
+  }
+}
